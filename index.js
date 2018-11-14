@@ -6,23 +6,23 @@ const DANISH = 'danish';
 const SCOTISH = 'scotish';
 const SUPERLIGA_ID = '/271';
 const PREMIERSHIP_ID = '/501';
-
+const API_TOKEN = 'PMOGRNpIH2oxAANr6EBmKycVeMyzq41uGhOaVjCTvmUrVOnxa2bt3ympnxoH';
 module.exports = function (ctx, req, res) {
   let league = getLeagueIdFromName(ctx.data.name);
 
   if(league){
     axios.get('https://soccer.sportmonks.com/api/v2.0/leagues'+ league,
-    {
-      params:{
-        'api_token':'PMOGRNpIH2oxAANr6EBmKycVeMyzq41uGhOaVjCTvmUrVOnxa2bt3ympnxoH'
-      }
-    })
-    .then(response => {
-      res.writeHead(200, { 'Content-Type': 'text/html '});
-      res.end('<h1>Hello, world!</h1>');
+    {params:{ 'api_token': API_TOKEN }})
+    .then(leagues => {
+      let sessionId = leagues.data.data.current_season_id;
+      return axios.get('https://soccer.sportmonks.com/api/v2.0/topscorers/season/' + sessionId + '/aggregated',
+      {params:{ 'api_token': API_TOKEN }});
+    }).then(topscorers => {
+      res.writeHead(200, { 'Content-Type': 'text/html'});
+      res.end('<h1>hello baby</h1>');
     }).catch(error => {
       res.writeHead(500, { 'Content-Type': 'application/json'});
-      res.end('{"message": "Unexpected Error, try agail later."}');
+      res.end('{"message": "Unexpected Error, try again later."}');
     });
   } else {
     res.writeHead(404, { 'Content-Type': 'application/json'});
