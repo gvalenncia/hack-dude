@@ -7,19 +7,26 @@ const SCOTISH = 'scotish';
 const SUPERLIGA_ID = '/271';
 const PREMIERSHIP_ID = '/501';
 
-module.exports = function (ctx, done) {
+module.exports = function (ctx, req, res) {
   let league = getLeagueIdFromName(ctx.data.name);
 
   if(league){
-    let url = '	https://soccer.sportmonks.com/api/v2.0/leagues'+ league +
-    '?api_token=PMOGRNpIH2oxAANr6EBmKycVeMyzq41uGhOaVjCTvmUrVOnxa2bt3ympnxoH';
-  
-    axios.get(url)
-    .then(response => {
-      done(null, 'Hello, ' + ctx.data.name);
+    axios.get('https://soccer.sportmonks.com/api/v2.0/leagues'+ league,
+    {
+      params:{
+        'api_token':'PMOGRNpIH2oxAANr6EBmKycVeMyzq41uGhOaVjCTvmUrVOnxa2bt3ympnxoH'
+      }
     })
+    .then(response => {
+      res.writeHead(200, { 'Content-Type': 'text/html '});
+      res.end('<h1>Hello, world!</h1>');
+    }).catch(error => {
+      res.writeHead(500, { 'Content-Type': 'application/json'});
+      res.end('{"message": "Unexpected Error, try agail later."}');
+    });
   } else {
-    done(null, 'Provide a valid league name.');
+    res.writeHead(404, { 'Content-Type': 'application/json'});
+    res.end('{"message": "League name not found, please provide a valid one"}');
   }
 }
 
